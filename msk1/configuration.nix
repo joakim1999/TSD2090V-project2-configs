@@ -19,7 +19,7 @@
   # Define on which hard drive you want to install Grub.
   boot.loader.grub.device = "/dev/sda"; # or "nodev" for efi only
 
-  networking.hostName = "Bedrift13-Maskin1"; # Define your hostname.
+  networking.hostName = "bedrift13-maskin1"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # Set your time zone.
@@ -29,7 +29,18 @@
   # Per-interface useDHCP will be mandatory in the future, so this generated config
   # replicates the default behaviour.
   networking.useDHCP = false;
-  networking.interfaces.eno1.useDHCP = true;
+  networking.interfaces.eno1.ipv4.addresses = [
+    {
+      address = "10.200.13.2";
+      prefixLength = 28;
+    }
+    {
+      address = "10.0.0.1";
+      prefixLength = 24;
+    }
+  ];
+  networking.defaultGateway = "10.200.13.1";
+  networking.nameservers = [ "10.250.0.5" ];
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
