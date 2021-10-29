@@ -18,7 +18,9 @@
   # boot.loader.efi.efiSysMountPoint = "/boot/efi";
   # Define on which hard drive you want to install Grub.
   boot.loader.grub.device = "/dev/sda"; # or "nodev" for efi only
-
+  boot.kernel.sysctl = {
+    "net.ipv4.conf.all.forwarding" = true;
+  };
   networking.hostName = "bedrift13-maskin1"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
@@ -29,18 +31,45 @@
   # Per-interface useDHCP will be mandatory in the future, so this generated config
   # replicates the default behaviour.
   networking.useDHCP = false;
-  networking.interfaces.eno1.ipv4.addresses = [
-    {
-      address = "10.200.13.2";
-      prefixLength = 28;
-    }
-    {
-      address = "10.0.0.1";
-      prefixLength = 24;
-    }
-  ];
+  networking.interfaces.eno1.useDHCP = false;
   networking.defaultGateway = "10.200.13.1";
   networking.nameservers = [ "10.250.0.5" ];
+  networking.nat.enable = true;
+  networking.nat.forwardPorts = [
+  {
+    destination = "10.0.0.2:22";
+    proto = "tcp";
+    sourcePort = 20022;
+  }
+  {
+    destination = "10.0.0.3:22";
+    proto = "tcp";
+    sourcePort = 30022;
+  }
+  {
+    destination = "10.0.0.4:22";
+    proto = "tcp";
+    sourcePort = 40022;
+  }
+  {
+    destination = "10.0.0.254:22";
+    proto = "tcp";
+    sourcePort = 50022;
+  }];
+  networking.nat.externalInterface = "vlan2";
+  networking.nat.internalInterfaces = [ "vlan130" ];
+  networking.vlans = {
+    vlan2 = { id=2; interface="eno1"; };
+    vlan130 = { id=130; interface="eno1"; };
+  };
+  networking.interfaces.vlan2.ipv4.addresses = [{
+    address = "10.200.13.2";
+    prefixLength = 28;
+  }];
+  networking.interfaces.vlan130.ipv4.addresses = [{
+    address = "10.0.0.1";
+    prefixLength = 24;
+  }];
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
@@ -119,7 +148,7 @@
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
+  networking.firewall.enable = false;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
