@@ -29,7 +29,14 @@
   # Per-interface useDHCP will be mandatory in the future, so this generated config
   # replicates the default behaviour.
   networking.useDHCP = false;
-  networking.interfaces.enp0s25.useDHCP = true;
+  # networking.interfaces.enp0s25.useDHCP = true;
+    networking.interfaces.enp0s25.ipv4.addresses = [ {
+        address = "10.0.0.4";
+	prefixLength = 24;
+    } ];
+
+    networking.defaultGateway = "10.0.0.1";
+    networking.nameservers = [ "10.250.0.5" ];
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
